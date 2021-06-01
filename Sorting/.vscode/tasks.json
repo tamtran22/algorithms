@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compile and run",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-g",
+                "${relativeFile}",
+                "-o",
+                "${fileBasenameNoExtension}.exe",
+                ";",
+                "./${fileBasenameNoExtension}.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true  
+            }
+        }
+    ]
+}
