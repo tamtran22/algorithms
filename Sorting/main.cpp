@@ -14,7 +14,7 @@ void print(std::vector<T> vec) {
 int main() {
     // MergeSort<int> ms;
     QuickSort<int> qs;
-    std::vector<int> a{2,1,7,34,46,22222,1,-3,5,3,4,1};
+    std::vector<int> a{2,1,7,34,22222,1,-3,5,3,4,1};
     qs.sort(a);
     print<int>(a);
     return 0;
