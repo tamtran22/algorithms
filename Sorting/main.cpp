@@ -12,10 +12,14 @@ void print(std::vector<T> vec) {
     cout<<endl;
 }
 int main() {
-    // MergeSort<int> ms;
-    QuickSort<int> qs;
-    std::vector<int> a{2,1,7,34,22222,1,-3,5,3,4,1};
-    qs.sort(a);
-    print<int>(a);
+    // std::vector<SampleString> a;
+    // a.push_back(SampleString("lsfjslkdf"));
+    // a.push_back(SampleString("133"));
+    // a.push_back(SampleString("23233"));
+    // a.push_back(SampleString("lsfjlkdf"));
+    // a.push_back(SampleString("13"));
+    // a.push_back(SampleString("23fffffff233"));
+    // MergeSort<SampleString>(a);
+    // print(a);
     return 0;
 }
