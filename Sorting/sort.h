@@ -5,6 +5,35 @@
 
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
+class AbstractDatType {
+private:
+    virtual bool isEqual(AbstractDatType a);
+    virtual bool isSmaller(AbstractDatType a);
+public:
+    AbstractDatType() {};
+    ~AbstractDatType() {};
+    bool operator<(AbstractDatType a) {
+        return this->isSmaller(a);
+    };
+    bool operator<=(AbstractDatType a) {
+        return this->isSmaller(a) || this->isEqual(a);
+    };
+};
+
+class SampleString : public AbstractDatType {
+private:
+    std::string value;
+    bool isEqual(SampleString a) {
+        return this->value.length() == a.value.length();
+    };
+    bool isSmaller(SampleString a) {
+        return this->value.length() < a.value.length();
+    };
+public:
+    SampleString(std::string s) {
+        this->value = s;
+    };
+};
 
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////

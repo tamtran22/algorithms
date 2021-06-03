@@ -21,5 +21,12 @@ int main() {
     // a.push_back(SampleString("23fffffff233"));
     // MergeSort<SampleString>(a);
     // print(a);
+    SampleString a("aaaaaa");
+    SampleString b("kkkkk");
+    if (a < b) {
+        std::cout<<"a nho hon b";
+    } else {
+        std::cout<<"a ko nho hon b";
+    }
     return 0;
 }
