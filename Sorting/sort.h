@@ -5,34 +5,46 @@
 
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
-class AbstractDatType {
-private:
-    virtual bool isEqual(AbstractDatType a);
-    virtual bool isSmaller(AbstractDatType a);
+class AbstractComparableType {
 public:
-    AbstractDatType() {};
-    ~AbstractDatType() {};
-    bool operator<(AbstractDatType a) {
-        return this->isSmaller(a);
-    };
-    bool operator<=(AbstractDatType a) {
-        return this->isSmaller(a) || this->isEqual(a);
-    };
+    virtual ~AbstractComparableType() {};
+    virtual bool isEqual(AbstractComparableType& a)=0;
+    virtual bool isSmaller(AbstractComparableType& a)=0;
+};
+bool operator<(AbstractComparableType& a, AbstractComparableType& b) {
+    return a.isSmaller(b);
+};
+bool operator>(AbstractComparableType& a, AbstractComparableType& b) {
+    return b.isSmaller(a);
+};
+bool operator<=(AbstractComparableType& a, AbstractComparableType& b) {
+    return a.isSmaller(b) || a.isEqual(b);
+};
+bool operator>=(AbstractComparableType& a, AbstractComparableType& b) {
+    return b.isSmaller(a) || a.isEqual(b);
 };
 
-class SampleString : public AbstractDatType {
-private:
-    std::string value;
-    bool isEqual(SampleString a) {
-        return this->value.length() == a.value.length();
-    };
-    bool isSmaller(SampleString a) {
-        return this->value.length() < a.value.length();
-    };
+
+
+
+
+
+class SampleString : public AbstractComparableType {
 public:
+    std::string value;
     SampleString(std::string s) {
         this->value = s;
     };
+    ~SampleString() {};
+    bool isEqual(AbstractComparableType& a) override {
+        auto _a = dynamic_cast<SampleString&>(a);
+        return this->value.length() == _a.value.length();
+    };
+    bool isSmaller(AbstractComparableType& a) override {
+        auto _a = dynamic_cast<SampleString&>(a);
+        return this->value.length() < _a.value.length();
+    };
+
 };
 
 /////////////////////////////////////////////////////////////////////
@@ -111,9 +123,9 @@ void MergeSort(std::vector<T> &vec) {
         [&sort, merge](std::vector<T> &vec, int left, int right) {
         if (right - left > 1) {
             int middle = (left + right) / 2;
-            sort(vec, left, middle);
-            sort(vec, middle, right);
-            merge(vec, left, middle, right);
+            // sort(vec, left, middle);
+            // sort(vec, middle, right);
+            // merge(vec, left, middle, right);
         }
     };
     sort(vec, 0, vec.size());
