@@ -19,8 +19,9 @@ int main() {
     a.push_back(SampleString("lsfjlkdf"));
     a.push_back(SampleString("13"));
     a.push_back(SampleString("23fffffff233"));
+    // std::vector<double> a{1,3,54,6.6,4,3,1,-3,44.3};
     cout<<a.size()<<endl;
-    MergeSort<SampleString>(a);
-    // print(a);
+    QuickSort<SampleString>(a);
+    print(a);
     return 0;
 }

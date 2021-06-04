@@ -6,127 +6,170 @@
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 class AbstractComparableType {
-public:
-    virtual ~AbstractComparableType() {};
+private:
     virtual bool isEqual(AbstractComparableType& a)=0;
     virtual bool isSmaller(AbstractComparableType& a)=0;
+public:
+    virtual ~AbstractComparableType() {};
+    bool operator<(AbstractComparableType& b) {
+        return this->isSmaller(b);
+    };
+    bool operator>(AbstractComparableType& b) {
+        return (!this->isSmaller(b)) && (!this->isEqual(b));
+    };
+    bool operator<=(AbstractComparableType& b) {
+        return this->isSmaller(b) || this->isEqual(b);
+    };
+    bool operator>=(AbstractComparableType& b) {
+        return !this->isSmaller(b);
+    };
 };
-bool operator<(AbstractComparableType& a, AbstractComparableType& b) {
-    return a.isSmaller(b);
-};
-bool operator>(AbstractComparableType& a, AbstractComparableType& b) {
-    return b.isSmaller(a);
-};
-bool operator<=(AbstractComparableType& a, AbstractComparableType& b) {
-    return a.isSmaller(b) || a.isEqual(b);
-};
-bool operator>=(AbstractComparableType& a, AbstractComparableType& b) {
-    return b.isSmaller(a) || a.isEqual(b);
-};
 
 
-
-
-
-
+// A sample of comparable data type.
 class SampleString : public AbstractComparableType {
+private:
+    bool isEqual(AbstractComparableType& a) override {
+        // Important to dynamic cast to subclass
+        auto _a = dynamic_cast<SampleString&>(a); 
+        return this->value.length() == _a.value.length();
+    };
+    bool isSmaller(AbstractComparableType& a) override {
+        // Important to dynamic cast to subclass
+        auto _a = dynamic_cast<SampleString&>(a);
+        return this->value.length() < _a.value.length();
+    };
 public:
     std::string value;
+    SampleString() {};
     SampleString(std::string s) {
         this->value = s;
     };
     ~SampleString() {};
-    bool isEqual(AbstractComparableType& a) override {
-        auto _a = dynamic_cast<SampleString&>(a);
-        return this->value.length() == _a.value.length();
-    };
-    bool isSmaller(AbstractComparableType& a) override {
-        auto _a = dynamic_cast<SampleString&>(a);
-        return this->value.length() < _a.value.length();
-    };
 
 };
 
+
+
+// Quick Sort
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 template <class T>
 void QuickSort(std::vector<T> &vec) {
+
     std::function<void(std::vector<T>&, int, int)> swap = 
-        [](std::vector<T> &vec, int i, int j) {
-        if ((i < vec.size()) && (j < vec.size()) && (i >= 0) && ( j>= 0)) {
-            T temp = vec[i];
-            vec[i] = vec[j];
-            vec[j] = temp;
-        } //else {
-        //     std::cout << "Index out of bound." << std::endl;
-        // }
+        [](std::vector<T> &vec, int ithPositionIndex, int jthPositionIndex) {
+        if ((ithPositionIndex < vec.size()) && (jthPositionIndex < vec.size()) 
+            && (ithPositionIndex >= 0) && (jthPositionIndex>= 0)) {
+            T tempElement = vec[ithPositionIndex];
+            vec[ithPositionIndex] = vec[jthPositionIndex];
+            vec[jthPositionIndex] = tempElement;
+        }
     };
+
     std::function<int(std::vector<T>&, int, int)> partition = 
-        [swap](std::vector<T> &vec, int left, int right) {
-        int i = left - 1, pivot = right - 1;
-        for (int j = left; j < pivot; j++) {
-            if (vec[j] < vec[pivot]) {
-                i++;
-                swap(vec, i, j);
+        [swap](std::vector<T> &vec, int leftIndex, int rightIndex) {
+        int firstLargerThanPivotIndex = leftIndex, pivotIndex = rightIndex - 1; // Last element as pivot.
+        for (int j = leftIndex; j < pivotIndex; j++) {
+            if (vec[j] < vec[pivotIndex]) {
+                swap(vec, firstLargerThanPivotIndex++, j);
             }
         }
-        T temp = vec[pivot];
-        for (int j = pivot; j > i + 1; j--) {
+        T tempElement = vec[pivotIndex];
+        for (int j = pivotIndex; j > firstLargerThanPivotIndex + 1; j--) {
             vec[j] = vec[j-1];
         }
-        vec[i+1] = temp;
-        return i + 1;
+        vec[firstLargerThanPivotIndex] = tempElement;
+        return firstLargerThanPivotIndex;
     };
+
     std::function<void(std::vector<T>&, int, int)> sort = 
-        [partition, &sort](std::vector<T> &vec, int left, int right) {
-        if (left < right) {
-            int pivot = partition(vec, left, right);
-            sort(vec, left, pivot);
-            sort(vec, pivot + 1, right);
+        [partition, &sort](std::vector<T> &vec, int leftIndex, int rightIndex) {
+        if (leftIndex < rightIndex) {
+            int pivotIndex = partition(vec, leftIndex, rightIndex);
+            sort(vec, leftIndex, pivotIndex);
+            sort(vec, pivotIndex + 1, rightIndex);
         }
     };
     sort(vec, 0, vec.size());
 }
 
+
+
+// Merge Sort
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 template <class T>
 void MergeSort(std::vector<T> &vec) {
+
     std::function<void(std::vector<T>&, int, int, int)> merge =
-        [](std::vector<T> &vec, int left, int middle, int right) {
-        int left_i=left, right_i=middle, i=left;
-        std::vector<T> temp(vec.size());
+        [](std::vector<T> &vec, int leftIndex, int middleIndex, int rightIndex) {
+        int leftIncrementIndex=leftIndex, rightIncrementIndex=middleIndex, currentTempIndex=leftIndex;
+        std::vector<T> tempVec(vec.size());
         while (true) {
-            if (left_i == middle) {
-                for (int j = right_i; j < right; j++) {
-                    temp[i++] = vec[j];
+            if (leftIncrementIndex == middleIndex) {
+                for (int j = rightIncrementIndex; j < rightIndex; j++) {
+                    tempVec[currentTempIndex++] = vec[j];
                 }
                 break;
-            } else if (right_i == right) {
-                for (int j = left_i; j < middle; j++) {
-                    temp[i++] = vec[j];
+            } else if (rightIncrementIndex == rightIndex) {
+                for (int j = leftIncrementIndex; j < middleIndex; j++) {
+                    tempVec[currentTempIndex++] = vec[j];
                 }
                 break;
-            } else if (vec[left_i] <= vec[right_i]) {
-                temp[i++] = vec[left_i];
-                left_i++;
+            } else if (vec[leftIncrementIndex] <= vec[rightIncrementIndex]) {
+                tempVec[currentTempIndex++] = vec[leftIncrementIndex];
+                leftIncrementIndex++;
             } else {
-                temp[i++] = vec[right_i];
-                right_i++;
+                tempVec[currentTempIndex++] = vec[rightIncrementIndex];
+                rightIncrementIndex++;
             }
         }
-        for (int j = left; j < right; j++) {
-            vec[j] = temp[j];
+        for (int j = leftIndex; j < rightIndex; j++) {
+            vec[j] = tempVec[j];
         }
     };
+
     std::function<void(std::vector<T>&, int, int)> sort =
-        [&sort, merge](std::vector<T> &vec, int left, int right) {
-        if (right - left > 1) {
-            int middle = (left + right) / 2;
-            // sort(vec, left, middle);
-            // sort(vec, middle, right);
-            // merge(vec, left, middle, right);
+        [&sort, merge](std::vector<T> &vec, int leftIndex, int rightIndex) {
+        if (rightIndex - leftIndex > 1) {
+            int middleIndex = (leftIndex + rightIndex) / 2;
+            sort(vec, leftIndex, middleIndex);
+            sort(vec, middleIndex, rightIndex);
+            merge(vec, leftIndex, middleIndex, rightIndex);
         }
     };
+    
     sort(vec, 0, vec.size());
 }
+
+
+
+// Insertion Sort
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+template <class T>
+void InsertionSort(std::vector<T> &vec) {
+    int forwardIndex, backwardIndex, currentIndex;
+    T currentElement;
+    for (forwardIndex = 1; forwardIndex < vec.size(); forwardIndex++) {
+        currentIndex = forwardIndex;
+        currentElement = vec[currentIndex];
+        for (backwardIndex = currentIndex - 1; backwardIndex >=0; backwardIndex--) {
+            if (vec[backwardIndex] <= currentElement) {
+                break;
+            } else {
+                vec[backwardIndex + 1] = vec[backwardIndex];
+            }
+        }
+        vec[backwardIndex + 1] = currentElement;
+    }
+}
+
+
+
+// Selection Sort
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+
+
